@@ -5,3 +5,7 @@ all: hcx
 
 hcx:
 	$(CC) src/hcx.c $(CFLAGS) -o hcx
+
+
+clean:
+	rm hcx
