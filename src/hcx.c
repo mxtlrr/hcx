@@ -39,9 +39,15 @@ int main(void){
 	// Win+F1 to Win+F3
 	// Win+Button1
 	// Win+Button3, which is RMB
-	XGrabKey(dpy, XKeysymToKeycode(dpy, XStringToKeysym("F1")), WIN, DefaultRootWindow(dpy), True, GrabModeAsync, GrabModeAsync);
-	XGrabKey(dpy, XKeysymToKeycode(dpy, XStringToKeysym("F2")), WIN, DefaultRootWindow(dpy), True, GrabModeAsync, GrabModeAsync);
-	XGrabKey(dpy, XKeysymToKeycode(dpy, XStringToKeysym("F3")), WIN, DefaultRootWindow(dpy), True, GrabModeAsync, GrabModeAsync);
+
+	// F1-F3 written better
+	for(int j = 67; j != 70; j++){
+		KeyCode k = j;
+
+		// All can be grabbed via Win modifier
+		XGrabKey(dpy, XKeysymToKeycode(dpy, XKeycodeToKeysym(dpy, k, 0)), AnyModifier,
+		DefaultRootWindow(dpy), True, GrabModeAsync, GrabModeAsync);
+	}
 
 	XGrabButton(dpy, LMB, WIN, DefaultRootWindow(dpy), True, ButtonPressMask|ButtonReleaseMask|PointerMotionMask, GrabModeAsync, GrabModeAsync, None, None);
 	XGrabButton(dpy, RMB, WIN, DefaultRootWindow(dpy), True, ButtonPressMask|ButtonReleaseMask|PointerMotionMask, GrabModeAsync, GrabModeAsync, None, None);
@@ -71,15 +77,30 @@ int main(void){
 			}
 		}
 
+
 		if(ev.type == ButtonPress && ev.xbutton.subwindow != None){
 			XGetWindowAttributes(dpy, ev.xbutton.subwindow, &attr);
 			start = ev.xbutton;
 		} else {
 			// We are on the root window
-			if(ev.type == ButtonPress &&	ev.xbutton.window == DefaultRootWindow(dpy)){
+			if(ev.type == ButtonPress &&ev.xbutton.window == DefaultRootWindow(dpy)){
 				unsigned int button = ev.xbutton.button;
-				printf("unhandeled button: %d\n", button);
-				// switch(button)
+				switch(button){
+					case LMB:
+						printf("Opening menucmd that is \"%s\"\n", menucmd[0]);
+						// open dmenu or whatever the menu cmd is
+						spawn(menucmd);
+						break;
+
+					case 3:
+						printf("rmb\n");
+						break;
+
+					
+					default:
+						printf("unhandled button: %d\n", button);
+						break;
+				}
 			}
 		}
 		
