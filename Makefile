@@ -1,11 +1,11 @@
 CC := gcc
 CFLAGS := -lX11 -Os -std=c11
 
-all: hcx
+all: makehcx
 
-hcx:
-	$(CC) src/hcx.c $(CFLAGS) -o hcx
-
+makehcx:
+	mkdir -p obj/
+	$(CC) src/hcx.c $(CFLAGS) -o obj/hcx
 
 clean:
-	rm hcx
+	rm obj/hcx
