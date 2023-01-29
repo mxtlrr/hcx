@@ -1,6 +1,12 @@
 #include <X11/Xlib.h>
 #include <stdio.h>
 
+#include <stdlib.h>
+#include <sys/wait.h>
+#include <unistd.h>
+
+#include "config.h"
+
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
 
 #define LMB 1
@@ -8,6 +14,18 @@
 
 #define ALT Mod1Mask
 #define WIN Mod4Mask
+
+static void spawn(char **com) {
+	if (fork() == 0) {
+		setsid();
+		if (fork() != 0) {
+			_exit(0);
+		}
+		execvp((char*)com[0], (char**)com);
+		_exit(0);
+	}
+  wait(NULL);
+}
 
 int main(void){
   Display* dpy;
@@ -44,9 +62,11 @@ int main(void){
           break;
 
         case 68: // F2
+          spawn(termcmd);
           break;
 
-        case 69:
+        case 69: // F3
+          spawn(menucmd);
           break;
       }
     }
