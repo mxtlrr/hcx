@@ -1,4 +1,6 @@
 #include <X11/Xlib.h>
+#include <X11/XKBlib.h>
+
 #include <stdio.h>
 
 #include <stdlib.h>
@@ -8,9 +10,6 @@
 #include "config.h"
 
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
-
-#define LMB 1
-#define RMB 3
 
 #define ALT Mod1Mask
 #define WIN Mod4Mask
@@ -45,7 +44,9 @@ int main(void){
 		KeyCode k = j;
 
 		// All can be grabbed via Win modifier
-		XGrabKey(dpy, XKeysymToKeycode(dpy, XKeycodeToKeysym(dpy, k, 0)), AnyModifier,
+		// KeySym s = XKeycodeToKeysym(dpy, k, 0);
+		KeySym s = XkbKeycodeToKeysym(dpy, k, 0, 0);
+		XGrabKey(dpy, XKeysymToKeycode(dpy, s), AnyModifier,
 		DefaultRootWindow(dpy), True, GrabModeAsync, GrabModeAsync);
 	}
 
@@ -84,22 +85,13 @@ int main(void){
 		} else {
 			// We are on the root window
 			if(ev.type == ButtonPress &&ev.xbutton.window == DefaultRootWindow(dpy)){
-				unsigned int button = ev.xbutton.button;
-				switch(button){
-					case LMB:
-						printf("Opening menucmd that is \"%s\"\n", menucmd[0]);
-						// open dmenu or whatever the menu cmd is
-						spawn(menucmd);
-						break;
-
-					case 3:
-						printf("rmb\n");
-						break;
-
-					
-					default:
-						printf("unhandled button: %d\n", button);
-						break;
+				int button = ev.xbutton.button;
+				if(button == menu_btn){
+					printf("Opening menucmd that is \"%s\"\n", menucmd[0]);
+					// open dmenu or whatever the menu cmd is
+					spawn(menucmd);
+				} else {
+					printf("unhandled button: %d\n", button);
 				}
 			}
 		}
