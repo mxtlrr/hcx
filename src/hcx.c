@@ -17,19 +17,14 @@ int main(void){
 
   if(!(dpy = XOpenDisplay(0x0))) return 1;
 
-  // Grab:
-  // All keysms
+  // Grab ONLY:
+  // Win+F1 to Win+F3
   // Win+Button1
   // Win+Button3, which is RMB
+  XGrabKey(dpy, XKeysymToKeycode(dpy, XStringToKeysym("F1")), WIN, DefaultRootWindow(dpy), True, GrabModeAsync, GrabModeAsync);
+  XGrabKey(dpy, XKeysymToKeycode(dpy, XStringToKeysym("F2")), WIN, DefaultRootWindow(dpy), True, GrabModeAsync, GrabModeAsync);
+  XGrabKey(dpy, XKeysymToKeycode(dpy, XStringToKeysym("F3")), WIN, DefaultRootWindow(dpy), True, GrabModeAsync, GrabModeAsync);
 
-  for(int j = 8; j != 256; j++){
-    KeyCode k = j;
-
-    // All can be grabbed via Win modifier
-    XGrabKey(dpy, XKeysymToKeycode(dpy, XKeycodeToKeysym(dpy, k, NULL)), AnyModifier,
-            DefaultRootWindow(dpy), True, GrabModeAsync, GrabModeAsync);
-  }
-  // XGrabKey(dpy, XKeysymToKeycode(dpy, XStringToKeysym("F1")), WIN, DefaultRootWindow(dpy), True, GrabModeAsync, GrabModeAsync);
   XGrabButton(dpy, LMB, WIN, DefaultRootWindow(dpy), True, ButtonPressMask|ButtonReleaseMask|PointerMotionMask, GrabModeAsync, GrabModeAsync, None, None);
   XGrabButton(dpy, RMB, WIN, DefaultRootWindow(dpy), True, ButtonPressMask|ButtonReleaseMask|PointerMotionMask, GrabModeAsync, GrabModeAsync, None, None);
 
@@ -40,11 +35,21 @@ int main(void){
 
     // Raise window
     if(ev.type == KeyPress && ev.xkey.subwindow != None){
+      printf("%d\n", ev.xkey.keycode);
       unsigned int keycode = ev.xkey.keycode;
-      printf("Keycode is %d\n", keycode);
-      
-      XRaiseWindow(dpy, ev.xkey.subwindow);
-    } else if(ev.type == KeyPress) printf("Keycode is %d\n", ev.xkey.keycode);
+      switch(keycode){
+        case 67: // F1
+          // Raise window only in this case
+          XRaiseWindow(dpy, ev.xkey.subwindow);
+          break;
+
+        case 68: // F2
+          break;
+
+        case 69:
+          break;
+      }
+    }
 
     if(ev.type == ButtonPress && ev.xbutton.subwindow != None){
       XGetWindowAttributes(dpy, ev.xbutton.subwindow, &attr);
